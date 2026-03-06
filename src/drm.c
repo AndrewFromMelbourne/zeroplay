@@ -270,7 +270,7 @@ int drm_present(DrmContext *ctx, DecodedFrame *frame)
         return -1;
     }
 
-    uint32_t stride  = frame->width;
+    uint32_t stride  = frame->stride;
     uint32_t y_size  = stride * frame->height;
 
     uint32_t handles[4]   = { gem_handle, gem_handle, 0, 0 };
@@ -281,7 +281,7 @@ int drm_present(DrmContext *ctx, DecodedFrame *frame)
 
     uint32_t fb_id = 0;
     int ret = drmModeAddFB2WithModifiers(ctx->fd,
-                                         frame->width, frame->height,
+                                         frame->stride, frame->height,
                                          DRM_FORMAT_NV12,
                                          handles, pitches, offsets, modifiers,
                                          &fb_id, DRM_MODE_FB_MODIFIERS);

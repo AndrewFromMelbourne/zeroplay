@@ -158,6 +158,7 @@ static int handle_source_change(VdecContext *ctx)
 
     ctx->width        = fmt.fmt.pix_mp.width;
     ctx->height       = fmt.fmt.pix_mp.height;
+    ctx->stride       = fmt.fmt.pix_mp.plane_fmt[0].bytesperline;
     ctx->cap_buf_size = fmt.fmt.pix_mp.plane_fmt[0].sizeimage;
 
     memset(&req, 0, sizeof(req));
@@ -393,6 +394,7 @@ int vdec_open(VdecContext *ctx, AVStream *stream,
 
         ctx->width        = cap_fmt.fmt.pix_mp.width;
         ctx->height       = cap_fmt.fmt.pix_mp.height;
+        ctx->stride       = cap_fmt.fmt.pix_mp.plane_fmt[0].bytesperline;
         ctx->cap_buf_size = cap_fmt.fmt.pix_mp.plane_fmt[0].sizeimage;
 
         struct v4l2_requestbuffers req;
@@ -560,7 +562,8 @@ void vdec_run(VdecContext *ctx)
 
                 frame->dmabuf_fd  = ctx->cap_dmabuf_fd[buf.index];
                 frame->buf_index  = (int)buf.index;
-                frame->width      = ctx->width;
+                frame->width      = ctx->stream_width;   /* visible width */
+                frame->stride     = ctx->stride;          /* bytesperline from driver */
                 frame->height     = ctx->height;
                 frame->src_height = ctx->orig_height;
                 frame->sar_num    = ctx->sar_num;

@@ -14,7 +14,8 @@
 typedef struct {
     int         dmabuf_fd;
     int         buf_index;
-    uint32_t    width;
+    uint32_t    width;      /* visible width (stream) */
+    uint32_t    stride;     /* padded buffer width from driver */
     uint32_t    height;
     uint32_t    src_height;
     int         sar_num;
@@ -41,6 +42,7 @@ typedef struct {
 
     uint32_t        width;
     uint32_t        height;
+    uint32_t        stride;         /* bytesperline from driver */
     uint32_t        orig_height;
     uint32_t        cap_buf_size;
     int             cap_dmabuf_fd[VDEC_CAPTURE_BUFS];
