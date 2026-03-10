@@ -63,11 +63,22 @@ int audio_open(AudioContext *ctx, AVStream *stream,
     pthread_cond_init(&ctx->pause_cond, NULL);
 
     /* Choose device */
-    if (device && device[0])
+    if (device && device[0]) {
         strncpy(ctx->device, device, sizeof(ctx->device) - 1);
-    else
-        strncpy(ctx->device, "plughw:CARD=vc4hdmi,DEV=0",
-                sizeof(ctx->device) - 1);
+    } else {
+        /* Default to vc4hdmi (Pi Zero 2W, Pi 3); fall back to vc4hdmi0
+         * (Pi 4 which has two HDMI ports and numbers them) */
+        snd_pcm_t *test = NULL;
+        if (snd_pcm_open(&test, "plughw:CARD=vc4hdmi,DEV=0",
+                         SND_PCM_STREAM_PLAYBACK, 0) == 0) {
+            snd_pcm_close(test);
+            strncpy(ctx->device, "plughw:CARD=vc4hdmi,DEV=0",
+                    sizeof(ctx->device) - 1);
+        } else {
+            strncpy(ctx->device, "plughw:CARD=vc4hdmi0,DEV=0",
+                    sizeof(ctx->device) - 1);
+        }
+    }
 
     /* ------------------------------------------------------------------ */
     /* 1. Initialise libavcodec audio decoder                              */
